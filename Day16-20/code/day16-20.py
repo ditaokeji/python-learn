@@ -19,7 +19,6 @@ print(prices3)
 names = ['关羽', '张飞', '赵云', '马超', '黄忠']
 courses = ['语文', '数学', '英语']
 
-<<<<<<< HEAD
 # source = [(name, course) for name in names for course in courses]
 source = [[None] * len(courses) for _ in range(len(names))] 
 print(source)
@@ -151,17 +150,9 @@ for x in range(20):
         if 5*x + 3*y + z/3 == 100:
             print(x, y, z)
             
-    
-=======
-source = [(name, course) for name in names for course in courses]
-
-print(source)
-
-#元组的用法
-items = ('hello', 'world')
-a, b = items
-print(a, b)
-
+   
+   
+   
 """
 贪婪法：在对问题求解时，总是做出在当前看来是最好的选择，不追求最优解，快速找到满意解。
 输入：
@@ -211,10 +202,11 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
-
-
-    """
+    main()    
+    
+    
+    
+ """
 快速排序 - 选择枢轴对元素进行划分，左边都比枢轴小右边都比枢轴大
 """
 def quick_sort(items, comp=lambda x, y: x <= y):
@@ -238,52 +230,314 @@ def _partition(items, start, end, comp):
             i += 1
             items[i], items[j] = items[j], items[i]
     items[i + 1], items[end] = items[end], items[i + 1]
-    return i + 1
+    return i + 1   
 
 
+
+def record_time(func):
+    """自定义装饰函数的装饰器"""
+    
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        start = time()
+        result = func(*args, **kwargs)
+        print(f'{func.__name__}: {time() - start}秒')
+        return result
+        
+    return wrapper
+  
+  
+  
+  def record_time(func):
+    """自定义装饰函数的装饰器"""
+    
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        start = time()
+        result = func(*args, **kwargs)
+        print(f'{func.__name__}: {time() - start}秒')
+        return result
+        
+    return wrapper  
+  
+  
+  
+  from functools import wraps
+from time import time
+
+
+def record(output):
+    """可以参数化的装饰器"""
+	
+	def decorate(func):
+		
+		@wraps(func)
+		def wrapper(*args, **kwargs):
+			start = time()
+			result = func(*args, **kwargs)
+			output(func.__name__, time() - start)
+			return result
+            
+		return wrapper
+	
+	return decorate
+
+
+from functools import wraps
+from time import time
+
+
+class Record():
+    """通过定义类的方式定义装饰器"""
+
+    def __init__(self, output):
+        self.output = output
+
+    def __call__(self, func):
+
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            start = time()
+            result = func(*args, **kwargs)
+            self.output(func.__name__, time() - start)
+            return result
+
+        return wrapper
+      
+      
+      
+      """
+月薪结算系统 - 部门经理每月15000 程序员每小时200 销售员1800底薪加销售额5%提成
 """
-递归回溯法：叫称为试探法，按选优条件向前搜索，当搜索到某一步，发现原先选择并不优或达不到目标时，就退回一步重新选择，比较经典的问题包括骑士巡逻、八皇后和迷宫寻路等。
-"""
-import sys
-import time
-
-SIZE = 5
-total = 0
+from abc import ABCMeta, abstractmethod
 
 
-def print_board(board):
-    for row in board:
-        for col in row:
-            print(str(col).center(4), end='')
-        print()
+class Employee(metaclass=ABCMeta):
+    """员工(抽象类)"""
+
+    def __init__(self, name):
+        self.name = name
+
+    @abstractmethod
+    def get_salary(self):
+        """结算月薪(抽象方法)"""
+        pass
 
 
-def patrol(board, row, col, step=1):
-    if row >= 0 and row < SIZE and \
-        col >= 0 and col < SIZE and \
-        board[row][col] == 0:
-        board[row][col] = step
-        if step == SIZE * SIZE:
-            global total
-            total += 1
-            print(f'第{total}种走法: ')
-            print_board(board)
-        patrol(board, row - 2, col - 1, step + 1)
-        patrol(board, row - 1, col - 2, step + 1)
-        patrol(board, row + 1, col - 2, step + 1)
-        patrol(board, row + 2, col - 1, step + 1)
-        patrol(board, row + 2, col + 1, step + 1)
-        patrol(board, row + 1, col + 2, step + 1)
-        patrol(board, row - 1, col + 2, step + 1)
-        patrol(board, row - 2, col + 1, step + 1)
-        board[row][col] = 0
+class Manager(Employee):
+    """部门经理"""
+
+    def get_salary(self):
+        return 15000.0
+
+
+class Programmer(Employee):
+    """程序员"""
+
+    def __init__(self, name, working_hour=0):
+        self.working_hour = working_hour
+        super().__init__(name)
+
+    def get_salary(self):
+        return 200.0 * self.working_hour
+
+
+class Salesman(Employee):
+    """销售员"""
+
+    def __init__(self, name, sales=0.0):
+        self.sales = sales
+        super().__init__(name)
+
+    def get_salary(self):
+        return 1800.0 + self.sales * 0.05
+
+
+class EmployeeFactory:
+    """创建员工的工厂（工厂模式 - 通过工厂实现对象使用者和对象之间的解耦合）"""
+
+    @staticmethod
+    def create(emp_type, *args, **kwargs):
+        """创建员工"""
+        all_emp_types = {'M': Manager, 'P': Programmer, 'S': Salesman}
+        cls = all_emp_types[emp_type.upper()]
+        return cls(*args, **kwargs) if cls else None
 
 
 def main():
-    board = [[0] * SIZE for _ in range(SIZE)]
-    patrol(board, SIZE - 1, SIZE - 1)
+    """主函数"""
+    emps = [
+        EmployeeFactory.create('M', '曹操'), 
+        EmployeeFactory.create('P', '荀彧', 120),
+        EmployeeFactory.create('P', '郭嘉', 85), 
+        EmployeeFactory.create('S', '典韦', 123000),
+    ]
+    for emp in emps:
+        print(f'{emp.name}: {emp.get_salary():.2f}元')
 
 
 if __name__ == '__main__':
     main()
->>>>>>> 0336d9020a980259668fe66fcb864f9cee8c4390
+    
+    
+    """
+经验：符号常量总是优于字面常量，枚举类型是定义符号常量的最佳选择
+"""
+from enum import Enum, unique
+
+import random
+
+
+@unique
+class Suite(Enum):
+    """花色"""
+
+    SPADE, HEART, CLUB, DIAMOND = range(4)
+
+    def __lt__(self, other):
+        return self.value < other.value
+
+
+class Card:
+    """牌"""
+
+    def __init__(self, suite, face):
+        """初始化方法"""
+        self.suite = suite
+        self.face = face
+
+    def show(self):
+        """显示牌面"""
+        suites = ['♠︎', '♥︎', '♣︎', '♦︎']
+        faces = ['', 'A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K']
+        return f'{suites[self.suite.value]}{faces[self.face]}'
+
+    def __repr__(self):
+        return self.show()
+
+
+class Poker:
+    """扑克"""
+
+    def __init__(self):
+        self.index = 0
+        self.cards = [Card(suite, face)
+                      for suite in Suite
+                      for face in range(1, 14)]
+
+    def shuffle(self):
+        """洗牌（随机乱序）"""
+        random.shuffle(self.cards)
+        self.index = 0
+
+    def deal(self):
+        """发牌"""
+        card = self.cards[self.index]
+        self.index += 1
+        return card
+
+    @property
+    def has_more(self):
+        return self.index < len(self.cards)
+
+
+class Player:
+    """玩家"""
+
+    def __init__(self, name):
+        self.name = name
+        self.cards = []
+
+    def get_one(self, card):
+        """摸一张牌"""
+        self.cards.append(card)
+
+    def sort(self, comp=lambda card: (card.suite, card.face)):
+        """整理手上的牌"""
+        self.cards.sort(key=comp)
+
+
+def main():
+    """主函数"""
+    poker = Poker()
+    poker.shuffle()
+    players = [Player('东邪'), Player('西毒'), Player('南帝'), Player('北丐')]
+    while poker.has_more:
+        for player in players:
+                player.get_one(poker.deal())
+    for player in players:
+        player.sort()
+        print(player.name, end=': ')
+        print(player.cards)
+
+
+if __name__ == '__main__':
+    main()
+    
+    
+    typedef struct _object {
+    /* 引用计数 */
+    int ob_refcnt;
+    /* 对象指针 */
+    struct _typeobject *ob_type;
+} PyObject;
+    
+    
+    /* 增加引用计数的宏定义 */
+#define Py_INCREF(op)   ((op)->ob_refcnt++)
+/* 减少引用计数的宏定义 */
+#define Py_DECREF(op) \ //减少计数
+    if (--(op)->ob_refcnt != 0) \
+        ; \
+    else \
+        __Py_Dealloc((PyObject *)(op))
+        
+        
+        
+        class SetOnceMappingMixin:
+      """自定义混入类"""
+    __slots__ = ()
+
+    def __setitem__(self, key, value):
+        if key in self:
+            raise KeyError(str(key) + ' already set')
+        return super().__setitem__(key, value)
+
+
+class SetOnceDict(SetOnceMappingMixin, dict):
+    """自定义字典"""
+    pass
+
+
+my_dict= SetOnceDict()
+try:
+    my_dict['username'] = 'jackfrued'
+    my_dict['username'] = 'hellokitty'
+except KeyError:
+    pass
+print(my_dict)
+
+
+import threading
+
+
+class SingletonMeta(type):
+    """自定义元类"""
+
+    def __init__(cls, *args, **kwargs):
+        cls.__instance = None
+        cls.__lock = threading.RLock()
+        super().__init__(*args, **kwargs)
+
+    def __call__(cls, *args, **kwargs):
+        if cls.__instance is None:
+            with cls.__lock:
+                if cls.__instance is None:
+                    cls.__instance = super().__call__(*args, **kwargs)
+        return cls.__instance
+
+
+class President(metaclass=SingletonMeta):
+    """总统(单例类)"""
+    
+    pass
