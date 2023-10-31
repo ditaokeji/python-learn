@@ -130,6 +130,91 @@ l2 = ListNode(1, ListNode(3, ListNode(4)))
 str3 = solution.mergeTwoLists(l1,l2)
 print(str2)
 
+from typing import Optional,List
+
+class ListNode:
+    def __init__(self, val=0, next=None):
+        self.val = val
+        self.next = next
+
+# 使用列表生成链表
+def generate_linked_list(nums):
+    if not nums:
+        return None
+    head = ListNode(nums[0])
+    current = head
+    for i in range(1, len(nums)):
+        current.next = ListNode(nums[i])
+        current = current.next
+    return head
+
+nums = [1,2,3,4,5]
+linked_list = generate_linked_list(nums)
+
+
+class Solution:
+    def removeNthFromEnd(self, head: Optional[ListNode], n: int) -> Optional[ListNode]:
+      target = head
+      temp = target
+      len1 = 0
+      while temp:
+           len1 += 1
+           temp = temp.next
+      temp = res = ListNode(0)
+      temp.next = target
+      len2 = 0
+      while temp:
+          if len2 == len1 - n:
+             temp.next = temp.next.next
+          temp = temp.next
+          len2 += 1
+          if not temp:
+              break
+      return res.next
+
+class Solution:
+    def mergeKLists(self, lists: List[Optional[ListNode]]) -> Optional[ListNode]:
+        list = []
+        for item in lists:
+           while item:
+               list.append(item.val)
+               item = item.next
+        list.sort()
+        target = temp = ListNode(0)
+        for it in list:
+           temp.next = ListNode(it)
+           temp = temp.next
+        return target.next
+
+class Solution:
+    def swapPairs(self, head: Optional[ListNode]) -> Optional[ListNode]:
+        temp = head
+        target = iter = ListNode(0)
+        while temp:
+           odd_node = temp.next
+           even_node = temp
+           odd_node.next = even_node
+           iter.next = odd_node
+           iter = iter.next.next
+           temp = temp.next.next
+        return target
+
+# 输入：lists = [[1,4,5],[1,3,4],[2,6]]
+# 输出：[1,1,2,3,4,4,5,6]
+# 解释：链表数组如下：
+# [
+#   1->4->5,
+#   1->3->4,
+#   2->6
+# ]
+# 将它们合并到一个有序链表中得到。
+# 1->1->2->3->4->4->5->6
+
+
+
+solution = Solution()
+solution.swapPairs(generate_linked_list([1,2,3,4]))
+
 
 
 
